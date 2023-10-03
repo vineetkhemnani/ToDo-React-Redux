@@ -38,7 +38,7 @@ const Todos = ({listId}) => {
                   <div className="flex items-center justify-between">
                     <input
                       type="checkbox"
-                      checked={isChecked}
+                      // checked={isChecked}
                       onChange={() => handleCompleteTodo(list.id, todo.id)}
                     />
                     <p className="ml-2">{todo.text}</p>
