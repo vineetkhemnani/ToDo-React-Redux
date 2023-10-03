@@ -1,49 +1,68 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit'
 
 const initialState = {
-  todos: [{id:1, text:"Hello"}],
-  doneTodos:[]
+  lists: [
+    {
+      id: nanoid(),
+      name: 'Default List',
+      todos: [{ id: nanoid(), text: 'Hello' }],
+      doneTodos: [],
+    },
+    {
+      id: nanoid(),
+      name: 'List1',
+      todos: [{ id: nanoid(), text: 'List1' }],
+      doneTodos: [],
+    },
+  ],
 }
 
 export const todoSlice = createSlice({
-  name: 'todo',
+  name: 'lists',
   initialState,
   reducers: {
+    addList: (state, action) => {
+      const newList = {
+        id: nanoid(),
+        name: action.payload,
+        todos: [],
+        doneTodos: [],
+      }
+      state.lists.push(newList)
+    },
+    removeList: (state, action) => {
+      const listIdToRemove = action.payload
+      state.lists = state.lists.filter((list) => list.id !== listIdToRemove)
+    },
     addTodo: (state, action) => {
+      const { listId, text } = action.payload
+      const list = state.lists.find((list) => list.id === listId)
       const todo = {
         id: nanoid(),
-        text: action.payload,
+        text,
       }
-      state.todos.push(todo)
+      list.todos.push(todo)
     },
     removeTodo: (state, action) => {
-      // filter todo to delete using id
-      // state.todos = state.todos.filter((todo) => todo.id !== action.payload)
-      // Check both todos and doneTodos for the todo with the given id
-      const removeFromTodos = (todosArray) => {
-        return todosArray.filter((todo) => todo.id !== action.payload)
-      }
-
-      state.todos = removeFromTodos(state.todos)
-      state.doneTodos = removeFromTodos(state.doneTodos)
+      const { listId, todoId } = action.payload
+      const list = state.lists.find((list) => list.id === listId)
+      list.todos = list.todos.filter((todo) => todo.id !== todoId)
+      list.doneTodos = list.doneTodos.filter((todo) => todo.id !== todoId)
     },
     completeTodo: (state, action) => {
-      // find todo that is completed
-      const todoToComplete = state.todos.find(
-        (todo) => todo.id === action.payload
-      )
+      const { listId, todoId } = action.payload
+      const list = state.lists.find((list) => list.id === listId)
+      const todoToComplete = list.todos.find((todo) => todo.id === todoId)
 
       if (todoToComplete) {
-        // Remove the todo from todos
-        state.todos = state.todos.filter((todo) => todo.id !== action.payload)
-
-        // Add the completed todo to doneTodos
-        state.doneTodos.push(todoToComplete)
+        list.todos = list.todos.filter((todo) => todo.id !== todoId)
+        list.doneTodos.push(todoToComplete)
       }
     },
   },
 })
 
-export const {addTodo, removeTodo, completeTodo} = todoSlice.actions
+export const { addList, removeList, addTodo, removeTodo, completeTodo } =
+  todoSlice.actions
 
 export default todoSlice.reducer
